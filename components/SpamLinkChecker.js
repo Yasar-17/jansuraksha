@@ -181,7 +181,7 @@ const SpamLinkChecker = () => {
         {result && (
           <div className={`bg-slate-900/40 backdrop-blur-xl rounded-2xl border ${getStatusColor(result.status)} p-8 shadow-2xl transform transition-all duration-500 animate-fadeIn`}>
             {/* Status Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-8">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
                   {getStatusIcon(result.status)}
@@ -197,7 +197,7 @@ const SpamLinkChecker = () => {
               </div>
               
               {/* Confidence Score */}
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <div className="text-2xl font-bold text-white mb-1">
                   {result.confidence}%
                 </div>
