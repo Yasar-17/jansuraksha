@@ -1,7 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, ExternalLink, Loader, Eye, Zap, Globe, Lock } from 'lucide-react';
+import { Shield, AlertTriangle, ExternalLink, Loader, Eye, Zap, Globe, Lock } from 'lucide-react';
+import StatusBadge, { getStatusColor, getStatusText } from './StatusBadge';
+import FeatureCard from './FeatureCard';
+
+const FEATURES = [
+  {
+    icon: Shield,
+    title: 'AI-Powered Detection',
+    description: 'Advanced machine learning algorithms analyze URLs for potential threats and malicious patterns',
+  },
+  {
+    icon: Globe,
+    title: 'Real-time Analysis',
+    description: 'Instant security assessments with comprehensive threat intelligence and risk scoring',
+  },
+  {
+    icon: Lock,
+    title: 'Comprehensive Scanning',
+    description: 'Multi-layered security checks including domain reputation, SSL analysis, and pattern detection',
+  },
+];
 
 const SpamLinkChecker = () => {
   const [url, setUrl] = useState('');
@@ -15,7 +35,6 @@ const SpamLinkChecker = () => {
       return;
     }
 
-    // Basic URL validation
     try {
       new URL(url);
     } catch {
@@ -57,58 +76,12 @@ const SpamLinkChecker = () => {
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'safe':
-        return <CheckCircle className="w-6 h-6 text-emerald-500" />;
-      case 'suspicious':
-        return <AlertTriangle className="w-6 h-6 text-amber-500" />;
-      case 'dangerous':
-        return <Shield className="w-6 h-6 text-red-500" />;
-      default:
-        return <Eye className="w-6 h-6 text-slate-400" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'safe':
-        return 'border-emerald-200/50 bg-emerald-950/20';
-      case 'suspicious':
-        return 'border-amber-200/50 bg-amber-950/20';
-      case 'dangerous':
-        return 'border-red-200/50 bg-red-950/20';
-      default:
-        return 'border-slate-700 bg-slate-800/20';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'safe':
-        return 'Safe';
-      case 'suspicious':
-        return 'Suspicious';
-      case 'dangerous':
-        return 'Dangerous';
-      default:
-        return 'Unknown';
-    }
-  };
-
-  const getConfidenceBarColor = (confidence, status) => {
-    if (status === 'safe') return 'bg-emerald-500';
-    if (status === 'suspicious') return 'bg-amber-500';
-    if (status === 'dangerous') return 'bg-red-500';
-    return 'bg-slate-500';
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-800/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-700/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-800/10 rounded-full blur-3xl bg-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-700/10 rounded-full blur-3xl bg-pulse delay-1000" />
       </div>
 
       {/* Header */}
@@ -141,9 +114,9 @@ const SpamLinkChecker = () => {
         </div>
 
         {/* Input Section */}
-        <div className="bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-slate-800/50 p-8 mb-8 shadow-2xl">
+        <div className="bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-slate-800/50 p-4 sm:p-8 mb-8 shadow-2xl">
           <h3 id="url-form-title" className="text-xl font-semibold mb-6 text-slate-200">Enter URL for Analysis</h3>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="relative group">
               <ExternalLink aria-hidden="true" className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-300 transition-colors" />
@@ -159,7 +132,7 @@ const SpamLinkChecker = () => {
                 className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 focus-visible:border-slate-500 transition-all duration-300 hover:bg-slate-800/70"
               />
             </div>
-            
+
             {error && (
               <div id="url-error" role="alert" className="flex items-center gap-2 p-4 bg-red-950/30 border border-red-800/50 rounded-lg">
                 <AlertTriangle aria-hidden="true" className="w-5 h-5 text-red-400 flex-shrink-0" />
@@ -170,7 +143,7 @@ const SpamLinkChecker = () => {
             <div className="sr-only" aria-live="polite" aria-atomic="true">
               {loading && 'Analyzing URL, please wait.'}
             </div>
-            
+
             <button
               type="submit"
               disabled={loading}
@@ -192,56 +165,40 @@ const SpamLinkChecker = () => {
           </form>
         </div>
 
+        {/* Empty State */}
+        {!result && !loading && (
+          <div
+            className="mb-8 p-6 bg-slate-900/20 backdrop-blur-xl rounded-2xl border border-dashed border-slate-800/50 text-center"
+            aria-hidden="true"
+          >
+            <Eye className="w-8 h-8 text-slate-500 mx-auto mb-3" />
+            <p className="text-slate-400 text-sm max-w-md mx-auto">
+              Paste a URL above and click Analyze to see security findings, risk level, and recommendations.
+            </p>
+          </div>
+        )}
+
         {/* Results Section */}
         {result && (
           <div
             role="region"
             aria-live="polite"
             aria-label={`Analysis results: ${getStatusText(result.status)}, ${result.confidence}% confidence`}
-            className={`bg-slate-900/40 backdrop-blur-xl rounded-2xl border ${getStatusColor(result.status)} p-8 shadow-2xl transform transition-all duration-500 animate-fadeIn`}
+            className={`bg-slate-900/40 backdrop-blur-xl rounded-2xl border ${getStatusColor(result.status)} p-4 sm:p-8 shadow-2xl transform transition-all duration-500 animate-fadeIn`}
           >
-            {/* Status Header */}
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between mb-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
-                  {getStatusIcon(result.status)}
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-white">
-                    {getStatusText(result.status)}
-                  </h3>
-                  <p className="text-slate-400">
-                    Security Analysis Complete
-                  </p>
-                </div>
-              </div>
-              
-              {/* Confidence Score */}
-              <div className="text-left sm:text-right">
-                <div className="text-2xl font-bold text-white mb-1">
-                  {result.confidence}%
-                </div>
-                <div className="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full ${getConfidenceBarColor(result.confidence, result.status)} transition-all duration-1000`}
-                    style={{ width: `${result.confidence}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-slate-400 mt-1">Confidence</p>
-              </div>
-            </div>
+            <StatusBadge status={result.status} confidence={result.confidence} />
 
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Key Findings */}
               <div className="space-y-4">
                 <h4 className="font-semibold text-white text-lg flex items-center gap-2">
-                  <Eye className="w-5 h-5" />
+                  <Eye aria-hidden="true" className="w-5 h-5" />
                   Key Findings
                 </h4>
                 <div className="space-y-3">
                   {result.reasons.map((reason, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 bg-slate-800/30 rounded-lg border border-slate-700/30">
-                      <div className="w-2 h-2 bg-slate-400 rounded-full mt-2 flex-shrink-0"></div>
+                      <div className="w-2 h-2 bg-slate-400 rounded-full mt-2 flex-shrink-0" />
                       <span className="text-slate-200 text-sm">{reason}</span>
                     </div>
                   ))}
@@ -251,7 +208,7 @@ const SpamLinkChecker = () => {
               {/* Recommendation */}
               <div className="space-y-4">
                 <h4 className="font-semibold text-white text-lg flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+                  <Lock aria-hidden="true" className="w-5 h-5" />
                   Security Recommendation
                 </h4>
                 <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/30">
@@ -267,32 +224,13 @@ const SpamLinkChecker = () => {
 
         {/* Features Grid */}
         <div className="mt-20 grid md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: Shield,
-              title: 'AI-Powered Detection',
-              description: 'Advanced machine learning algorithms analyze URLs for potential threats and malicious patterns'
-            },
-            {
-              icon: Globe,
-              title: 'Real-time Analysis',
-              description: 'Instant security assessments with comprehensive threat intelligence and risk scoring'
-            },
-            {
-              icon: Lock,
-              title: 'Comprehensive Scanning',
-              description: 'Multi-layered security checks including domain reputation, SSL analysis, and pattern detection'
-            }
-          ].map((feature, index) => (
-            <div key={index} className="group relative">
-              <div className="p-6 bg-slate-900/30 backdrop-blur-xl rounded-2xl border border-slate-800/50 hover:border-slate-700/50 transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg hover:shadow-2xl">
-                <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 w-fit mb-4 group-hover:bg-slate-700/50 transition-colors">
-                  <feature.icon className="w-8 h-8 text-slate-300 group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 leading-relaxed">{feature.description}</p>
-              </div>
-            </div>
+          {FEATURES.map((feature) => (
+            <FeatureCard
+              key={feature.title}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+            />
           ))}
         </div>
       </main>
@@ -309,22 +247,6 @@ const SpamLinkChecker = () => {
           </p>
         </div>
       </footer>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { 
-            opacity: 0; 
-            transform: translateY(20px) scale(0.98); 
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0) scale(1); 
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 };
